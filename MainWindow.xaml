@@ -1,0 +1,12 @@
+﻿<Window x:Class="YourNamespace.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:YourNamespace.ViewModels"
+        Title="MainWindow" Height="350" Width="525">
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Button Name="OpenETABSButton" Content="Open ETABS" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding OpenETABSCommand}"/>
+    </Grid>
+</Window>
