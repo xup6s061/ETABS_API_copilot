@@ -1,13 +1,32 @@
 ﻿<Window x:Class="YourNamespace.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:YourNamespace.ViewModels"
-        Title="MainWindow" Height="350" Width="525">
-    <Window.DataContext>
-        <vm:MainViewModel />
-    </Window.DataContext>
-    <Grid>
-        <Button Name="OpenETABSButton" Content="Open ETABS" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding OpenETABSCommand}"/>
-        <Button Name="CreateNewETABSFileButton" Content="Create New ETABS File" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0" Command="{Binding CreateNewETABSFileCommand}"/>
-    </Grid>
+        Title="建築物構架生成器" Height="400" Width="300">
+    <StackPanel Margin="20">
+        <TextBlock Text="每跨的跨距 (米):" />
+        <TextBox Text="{Binding SpanLength, UpdateSourceTrigger=PropertyChanged}" Width="200" />
+
+        <TextBlock Text="每層樓的樓高 (米):" />
+        <TextBox Text="{Binding FloorHeight, UpdateSourceTrigger=PropertyChanged}" Width="200" />
+
+        <TextBlock Text="跨數:" />
+        <TextBox Text="{Binding NumSpans, UpdateSourceTrigger=PropertyChanged}" Width="200" />
+
+        <TextBlock Text="樓層數:" />
+        <TextBox Text="{Binding NumFloors, UpdateSourceTrigger=PropertyChanged}" Width="200" />
+
+        <Button Content="創建建築物構架"
+                Command="{Binding CreateBuildingFrameworkCommand}"
+                Margin="20"
+                Width="200" />
+
+        <Button Content="開啟 ETABS"
+                Command="{Binding OpenETABSCommand}"
+                Margin="10"
+                Width="200" />
+        <Button Content="創建新檔案"
+                Command="{Binding CreateNewETABSFileCommand}"
+                Margin="10"
+                Width="200" />
+    </StackPanel>
 </Window>
