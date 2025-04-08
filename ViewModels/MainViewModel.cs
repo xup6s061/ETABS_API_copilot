@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using ETABSv1; // 確保你已經引用了 ETABS API 的命名空間
+using ETABSv1;
 
 namespace YourNamespace.ViewModels
 {
@@ -17,14 +17,23 @@ namespace YourNamespace.ViewModels
         public ICommand CreateBuildingFrameworkCommand { get; }
 
         // 屬性
-        private double _floorHeight = 3.0; // 每層樓的樓高 (單位: 米)
-        private int _numFloors = 5; // 樓層數
-
-        private string _xSpanLengthsInput = "5,5,5"; // Default X spans
-        private string _ySpanLengthsInput = "5,5,5"; // Default Y spans
+        private string _floorHeightsInput = "2@3,5"; // Default floor heights
+        private string _xSpanLengthsInput = "2@3,5"; // Default X spans
+        private string _ySpanLengthsInput = "2@4,5"; // Default Y spans
 
         private double[] _xSpanLengths; // Parsed X spans
         private double[] _ySpanLengths; // Parsed Y spans
+        private double[] _floorHeights; // Parsed floor heights
+
+        public string FloorHeightsInput
+        {
+            get => _floorHeightsInput;
+            set
+            {
+                _floorHeightsInput = value;
+                OnPropertyChanged(nameof(FloorHeightsInput));
+            }
+        }
 
         public string XSpanLengthsInput
         {
@@ -44,18 +53,6 @@ namespace YourNamespace.ViewModels
                 _ySpanLengthsInput = value;
                 OnPropertyChanged(nameof(YSpanLengthsInput));
             }
-        }
-
-        public double FloorHeight
-        {
-            get => _floorHeight;
-            set { _floorHeight = value; OnPropertyChanged(nameof(FloorHeight)); }
-        }
-
-        public int NumFloors
-        {
-            get => _numFloors;
-            set { _numFloors = value; OnPropertyChanged(nameof(NumFloors)); }
         }
 
         // 構造函數
@@ -134,29 +131,34 @@ namespace YourNamespace.ViewModels
                     return;
                 }
 
-                // 嘗試解析 X 和 Y 方向的跨距輸入
+                // 嘗試解析 X 和 Y 方向的跨距輸入以及樓層高度
                 try
                 {
                     _xSpanLengths = ParseSpanLengths(_xSpanLengthsInput);
                     _ySpanLengths = ParseSpanLengths(_ySpanLengthsInput);
+                    _floorHeights = ParseSpanLengths(_floorHeightsInput);
                 }
                 catch
                 {
-                    MessageBox.Show("無法解析跨距輸入，請確保格式正確，例如: 2@5,3");
+                    MessageBox.Show("無法解析輸入，請確保格式正確，例如: 2@5,3");
                     return;
                 }
 
-                if (_xSpanLengths == null || _xSpanLengths.Length == 0 || _ySpanLengths == null || _ySpanLengths.Length == 0)
+                if (_xSpanLengths == null || _xSpanLengths.Length == 0 ||
+                    _ySpanLengths == null || _ySpanLengths.Length == 0 ||
+                    _floorHeights == null || _floorHeights.Length == 0)
                 {
-                    MessageBox.Show("請輸入有效的跨距長度！");
+                    MessageBox.Show("請輸入有效的跨距或樓層高度！");
                     return;
                 }
 
                 cSapModel sapModel = _etabsObject.SapModel;
 
-                for (int floor = 0; floor < _numFloors; floor++)
+                double zPrev = 0; // 初始化 zPrev 為 0
+
+                for (int floor = 0; floor < _floorHeights.Length; floor++)
                 {
-                    double z = floor * _floorHeight;
+                    double z = zPrev + _floorHeights[floor]; // 當前樓層的高度為前一樓層高度加上當前樓層高度
                     double x1 = 0; // 起始位置 x = 0
 
                     for (int xSpan = 0; xSpan <= _xSpanLengths.Length; xSpan++) // 包含最後一列
@@ -168,32 +170,30 @@ namespace YourNamespace.ViewModels
                         {
                             double y2 = ySpan < _ySpanLengths.Length ? y1 + _ySpanLengths[ySpan] : y1;
 
-                            // 添加梁（僅在樓層大於 0 且不是最後一列時）
-                            if (floor > 0 && xSpan < _xSpanLengths.Length)
+                            // 添加梁（僅在樓層大於等於 0 且不是最後一列時）
+                            if (floor >= 0 && xSpan < _xSpanLengths.Length)
                             {
                                 string beamNameX = "BeamX";
                                 sapModel.FrameObj.AddByCoord(x1, y1, z, x2, y1, z, ref beamNameX, "", "Auto");
                             }
 
-                            if (floor > 0 && ySpan < _ySpanLengths.Length)
+                            if (floor >= 0 && ySpan < _ySpanLengths.Length)
                             {
                                 string beamNameY = "BeamY";
                                 sapModel.FrameObj.AddByCoord(x1, y1, z, x1, y2, z, ref beamNameY, "", "Auto");
                             }
 
                             // 添加柱子
-                            if (floor > 0)
-                            {
-                                double zPrev = (floor - 1) * _floorHeight;
-                                string columnName = "Column";
-                                sapModel.FrameObj.AddByCoord(x1, y1, zPrev, x1, y1, z, ref columnName, "", "Auto");
-                            }
+                            string columnName = "Column";
+                            sapModel.FrameObj.AddByCoord(x1, y1, zPrev, x1, y1, z, ref columnName, "", "Auto");
 
                             y1 = y2; // 移動到下一個 Y 跨
                         }
 
                         x1 = x2; // 移動到下一個 X 跨
                     }
+
+                    zPrev = z; // 更新 zPrev 為當前樓層的高度
                 }
 
                 MessageBox.Show("三維建築物構架已成功創建！");
@@ -204,7 +204,7 @@ namespace YourNamespace.ViewModels
             }
         }
 
-        // 解析跨距輸入
+        // 解析輸入的跨距
         private double[] ParseSpanLengths(string input)
         {
             var parts = input.Split(',');

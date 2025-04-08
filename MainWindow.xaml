@@ -9,11 +9,8 @@
         <TextBlock Text="Y方向跨距 (以逗號分隔):" />
         <TextBox Text="{Binding YSpanLengthsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
 
-        <TextBlock Text="每層樓的樓高 (米):" />
-        <TextBox Text="{Binding FloorHeight, UpdateSourceTrigger=PropertyChanged}" Width="200" />
-
-        <TextBlock Text="樓層數:" />
-        <TextBox Text="{Binding NumFloors, UpdateSourceTrigger=PropertyChanged}" Width="200" />
+        <TextBlock Text="樓層高度 (以逗號分隔):" />
+        <TextBox Text="{Binding FloorHeightsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
 
         <Button Content="創建建築物構架"
                 Command="{Binding CreateBuildingFrameworkCommand}"
