@@ -8,5 +8,6 @@
     </Window.DataContext>
     <Grid>
         <Button Name="OpenETABSButton" Content="Open ETABS" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding OpenETABSCommand}"/>
+        <Button Name="CreateNewETABSFileButton" Content="Create New ETABS File" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0" Command="{Binding CreateNewETABSFileCommand}"/>
     </Grid>
 </Window>
