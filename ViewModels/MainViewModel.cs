@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using ETABSv1; // 確保你已經引用了 ETABS API 的命名空間
@@ -15,27 +17,39 @@ namespace YourNamespace.ViewModels
         public ICommand CreateBuildingFrameworkCommand { get; }
 
         // 屬性
-        private double _spanLength = 5.0; // 每跨的跨距 (單位: 米)
         private double _floorHeight = 3.0; // 每層樓的樓高 (單位: 米)
-        private int _numSpans = 3; // 跨數
         private int _numFloors = 5; // 樓層數
 
-        public double SpanLength
+        private string _xSpanLengthsInput = "5,5,5"; // Default X spans
+        private string _ySpanLengthsInput = "5,5,5"; // Default Y spans
+
+        private double[] _xSpanLengths; // Parsed X spans
+        private double[] _ySpanLengths; // Parsed Y spans
+
+        public string XSpanLengthsInput
         {
-            get => _spanLength;
-            set { _spanLength = value; OnPropertyChanged(nameof(SpanLength)); }
+            get => _xSpanLengthsInput;
+            set
+            {
+                _xSpanLengthsInput = value;
+                OnPropertyChanged(nameof(XSpanLengthsInput));
+            }
+        }
+
+        public string YSpanLengthsInput
+        {
+            get => _ySpanLengthsInput;
+            set
+            {
+                _ySpanLengthsInput = value;
+                OnPropertyChanged(nameof(YSpanLengthsInput));
+            }
         }
 
         public double FloorHeight
         {
             get => _floorHeight;
             set { _floorHeight = value; OnPropertyChanged(nameof(FloorHeight)); }
-        }
-
-        public int NumSpans
-        {
-            get => _numSpans;
-            set { _numSpans = value; OnPropertyChanged(nameof(NumSpans)); }
         }
 
         public int NumFloors
@@ -120,39 +134,112 @@ namespace YourNamespace.ViewModels
                     return;
                 }
 
+                // 嘗試解析 X 和 Y 方向的跨距輸入
+                try
+                {
+                    _xSpanLengths = ParseSpanLengths(_xSpanLengthsInput);
+                    _ySpanLengths = ParseSpanLengths(_ySpanLengthsInput);
+                }
+                catch
+                {
+                    MessageBox.Show("無法解析跨距輸入，請確保格式正確，例如: 2@5,3");
+                    return;
+                }
+
+                if (_xSpanLengths == null || _xSpanLengths.Length == 0 || _ySpanLengths == null || _ySpanLengths.Length == 0)
+                {
+                    MessageBox.Show("請輸入有效的跨距長度！");
+                    return;
+                }
+
                 cSapModel sapModel = _etabsObject.SapModel;
 
                 for (int floor = 0; floor < _numFloors; floor++)
                 {
                     double z = floor * _floorHeight;
-                    for (int span = 0; span <= _numSpans; span++) // Adjusted to include the last column
+                    double x1 = 0; // 起始位置 x = 0
+
+                    for (int xSpan = 0; xSpan <= _xSpanLengths.Length; xSpan++) // 包含最後一列
                     {
-                        double x1 = span * _spanLength;
+                        double x2 = xSpan < _xSpanLengths.Length ? x1 + _xSpanLengths[xSpan] : x1;
+                        double y1 = 0; // 起始位置 y = 0
 
-                        // Add beams between spans (skip for the last span)
-                        if (span < _numSpans && floor > 0)
+                        for (int ySpan = 0; ySpan <= _ySpanLengths.Length; ySpan++) // 包含最後一列
                         {
-                            double x2 = (span + 1) * _spanLength;
-                            string beamName = "Beam";
-                            sapModel.FrameObj.AddByCoord(x1, 0, z, x2, 0, z, ref beamName, "", "Auto");
+                            double y2 = ySpan < _ySpanLengths.Length ? y1 + _ySpanLengths[ySpan] : y1;
+
+                            // 添加梁（僅在樓層大於 0 且不是最後一列時）
+                            if (floor > 0 && xSpan < _xSpanLengths.Length)
+                            {
+                                string beamNameX = "BeamX";
+                                sapModel.FrameObj.AddByCoord(x1, y1, z, x2, y1, z, ref beamNameX, "", "Auto");
+                            }
+
+                            if (floor > 0 && ySpan < _ySpanLengths.Length)
+                            {
+                                string beamNameY = "BeamY";
+                                sapModel.FrameObj.AddByCoord(x1, y1, z, x1, y2, z, ref beamNameY, "", "Auto");
+                            }
+
+                            // 添加柱子
+                            if (floor > 0)
+                            {
+                                double zPrev = (floor - 1) * _floorHeight;
+                                string columnName = "Column";
+                                sapModel.FrameObj.AddByCoord(x1, y1, zPrev, x1, y1, z, ref columnName, "", "Auto");
+                            }
+
+                            y1 = y2; // 移動到下一個 Y 跨
                         }
 
-                        // Add columns for all spans
-                        if (floor > 0)
-                        {
-                            double zPrev = (floor - 1) * _floorHeight;
-                            string columnName = "Column";
-                            sapModel.FrameObj.AddByCoord(x1, 0, zPrev, x1, 0, z, ref columnName, "", "Auto");
-                        }
+                        x1 = x2; // 移動到下一個 X 跨
                     }
                 }
 
-                MessageBox.Show("建築物構架已成功創建！");
+                MessageBox.Show("三維建築物構架已成功創建！");
             }
             catch (Exception ex)
             {
                 MessageBox.Show("創建建築物構架時發生錯誤: " + ex.Message);
             }
+        }
+
+        // 解析跨距輸入
+        private double[] ParseSpanLengths(string input)
+        {
+            var parts = input.Split(',');
+            var spanList = new List<double>();
+
+            foreach (var part in parts)
+            {
+                if (part.Contains("@"))
+                {
+                    var subParts = part.Split('@');
+                    if (subParts.Length == 2 &&
+                        int.TryParse(subParts[0], out int count) &&
+                        double.TryParse(subParts[1], out double value))
+                    {
+                        spanList.AddRange(Enumerable.Repeat(value, count));
+                    }
+                    else
+                    {
+                        throw new FormatException();
+                    }
+                }
+                else
+                {
+                    if (double.TryParse(part, out double value))
+                    {
+                        spanList.Add(value);
+                    }
+                    else
+                    {
+                        throw new FormatException();
+                    }
+                }
+            }
+
+            return spanList.ToArray();
         }
 
         // 檢查 ETABS 是否正在運行

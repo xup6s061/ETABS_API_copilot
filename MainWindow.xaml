@@ -3,14 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="建築物構架生成器" Height="400" Width="300">
     <StackPanel Margin="20">
-        <TextBlock Text="每跨的跨距 (米):" />
-        <TextBox Text="{Binding SpanLength, UpdateSourceTrigger=PropertyChanged}" Width="200" />
+        <TextBlock Text="X方向跨距 (以逗號分隔):" />
+        <TextBox Text="{Binding XSpanLengthsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
+
+        <TextBlock Text="Y方向跨距 (以逗號分隔):" />
+        <TextBox Text="{Binding YSpanLengthsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
 
         <TextBlock Text="每層樓的樓高 (米):" />
         <TextBox Text="{Binding FloorHeight, UpdateSourceTrigger=PropertyChanged}" Width="200" />
-
-        <TextBlock Text="跨數:" />
-        <TextBox Text="{Binding NumSpans, UpdateSourceTrigger=PropertyChanged}" Width="200" />
 
         <TextBlock Text="樓層數:" />
         <TextBox Text="{Binding NumFloors, UpdateSourceTrigger=PropertyChanged}" Width="200" />
