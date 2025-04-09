@@ -3,26 +3,26 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="建築物構架生成器" Height="400" Width="300">
     <StackPanel Margin="20">
+        <TextBlock Text="樓層高度 (以逗號分隔):" />
+        <TextBox Text="{Binding FloorHeightsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
+        
         <TextBlock Text="X方向跨距 (以逗號分隔):" />
         <TextBox Text="{Binding XSpanLengthsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
 
         <TextBlock Text="Y方向跨距 (以逗號分隔):" />
         <TextBox Text="{Binding YSpanLengthsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
 
-        <TextBlock Text="樓層高度 (以逗號分隔):" />
-        <TextBox Text="{Binding FloorHeightsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
-
-        <Button Content="創建建築物構架"
-                Command="{Binding CreateBuildingFrameworkCommand}"
-                Margin="20"
-                Width="200" />
-
+        
         <Button Content="開啟 ETABS"
                 Command="{Binding OpenETABSCommand}"
                 Margin="10"
                 Width="200" />
         <Button Content="創建新檔案"
                 Command="{Binding CreateNewETABSFileCommand}"
+                Margin="10"
+                Width="200" />
+        <Button Content="創建建築物構架"
+                Command="{Binding CreateBuildingFrameworkCommand}"
                 Margin="10"
                 Width="200" />
     </StackPanel>
