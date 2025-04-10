@@ -8,6 +8,7 @@ namespace ETABS_API_copilot.Models
 {
     public class Material
     {
+        public string BuildingName { get; set; } // 所屬建築物名稱
         public string MaterialName { get; set; } // 材料名稱
         public double Density { get; set; } // 材料密度
         public double ElasticModulus { get; set; } // 彈性模數
@@ -16,6 +17,7 @@ namespace ETABS_API_copilot.Models
 
     public class SectionProperty
     {
+        public string BuildingName { get; set; } // 所屬建築物名稱
         public string SectionName { get; set; } // 斷面名稱
         public string Material { get; set; } // 此斷面所使用之材料名稱
         public double Width { get; set; } // 寬度

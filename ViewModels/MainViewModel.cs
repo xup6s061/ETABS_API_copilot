@@ -18,12 +18,15 @@ namespace ETABS_API_copilot.ViewModels
     {
         private cOAPI _etabsObject;
         private readonly JsonService _jsonService = new JsonService();
+        private Building _selectedBuilding;
 
         // 命令
         public ICommand OpenETABSCommand { get; }
         public ICommand CreateNewETABSFileCommand { get; }
         public ICommand CreateBuildingFrameworkCommand { get; }
         public ObservableCollection<Building> Buildings { get; set; } = new ObservableCollection<Building>();
+        public ObservableCollection<Material> AllMaterials { get; set; } = new ObservableCollection<Material>();
+        public ObservableCollection<SectionProperty> AllSectionProperties { get; set; } = new ObservableCollection<SectionProperty>();
         public RelayCommand LoadJsonCommand { get; }
         public RelayCommand SaveJsonCommand { get; }
         public RelayCommand ExecuteSelectedBuildingsCommand { get; }
@@ -63,7 +66,15 @@ namespace ETABS_API_copilot.ViewModels
                 System.Windows.MessageBox.Show("打開 ETABS 時發生錯誤: " + ex.Message);
             }
         }
-
+        public Building SelectedBuilding
+        {
+            get => _selectedBuilding;
+            set
+            {
+                _selectedBuilding = value;
+                OnPropertyChanged(nameof(SelectedBuilding));
+            }
+        }
         // 創建新檔案
         private void CreateNewETABSFile()
         {
@@ -113,11 +124,33 @@ namespace ETABS_API_copilot.ViewModels
 
             if (openFileDialog.ShowDialog() == true)
             {
-                var buildings = _jsonService.LoadFromJson(openFileDialog.FileName);
-                Buildings.Clear();
-                foreach (var building in buildings)
+                var jsonService = new JsonService();
+                var buildings = jsonService.LoadFromJson(openFileDialog.FileName);
+
+                if (buildings.Any())
                 {
-                    Buildings.Add(building);
+                    Buildings.Clear();
+                    AllMaterials.Clear();
+                    AllSectionProperties.Clear();
+
+                    foreach (var building in buildings)
+                    {
+                        Buildings.Add(building);
+
+                        // 將材料加入 AllMaterials，並附加 BuildingName
+                        foreach (var material in building.Materials)
+                        {
+                            material.BuildingName = building.BuildingName; // 動態添加 BuildingName
+                            AllMaterials.Add(material);
+                        }
+
+                        // 將斷面加入 AllSectionProperties，並附加 BuildingName
+                        foreach (var section in building.SectionProperties)
+                        {
+                            section.BuildingName = building.BuildingName; // 動態添加 BuildingName
+                            AllSectionProperties.Add(section);
+                        }
+                    }
                 }
             }
         }
