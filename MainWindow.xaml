@@ -20,7 +20,10 @@
         <!-- 參數 Tab -->
         <TabItem Header="參數">
             <StackPanel Margin="10">
-                <DataGrid ItemsSource="{Binding Buildings}" AutoGenerateColumns="False" Height="300">
+                <DataGrid ItemsSource="{Binding Buildings}" AutoGenerateColumns="False" Height="300"
+          SelectionUnit="CellOrRowHeader" SelectionMode="Extended"
+          KeyDown="DataGrid_KeyDown" ClipboardCopyMode="ExcludeHeader"
+          CanUserAddRows="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
                         <DataGridTextColumn Header="樓層高度 (m)" Binding="{Binding FloorHeights}" />
@@ -39,7 +42,10 @@
         <!-- 斷面 Tab -->
         <TabItem Header="斷面">
             <StackPanel Margin="10">
-                <DataGrid ItemsSource="{Binding AllSectionProperties}" AutoGenerateColumns="False" Height="300">
+                <DataGrid ItemsSource="{Binding AllSectionProperties}" AutoGenerateColumns="False" Height="300"
+          SelectionUnit="CellOrRowHeader" SelectionMode="Extended"
+          KeyDown="DataGrid_KeyDown" ClipboardCopyMode="ExcludeHeader"
+          CanUserAddRows="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
                         <DataGridTextColumn Header="斷面名稱" Binding="{Binding SectionName}" />
@@ -59,13 +65,16 @@
         <!-- 材料 Tab -->
         <TabItem Header="材料">
             <StackPanel Margin="10">
-                <DataGrid ItemsSource="{Binding AllMaterials}" AutoGenerateColumns="False" Height="300">
+                <DataGrid ItemsSource="{Binding AllMaterials}" AutoGenerateColumns="False" Height="300"
+          SelectionUnit="CellOrRowHeader" SelectionMode="Extended"
+          KeyDown="DataGrid_KeyDown" ClipboardCopyMode="ExcludeHeader"
+          CanUserAddRows="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
-                        <DataGridTextColumn Header="材料名稱" Binding="{Binding MaterialName}" />
-                        <DataGridTextColumn Header="密度 (kg/m³)" Binding="{Binding Density}" />
-                        <DataGridTextColumn Header="彈性模數 (Pa)" Binding="{Binding ElasticModulus, StringFormat=E3}" />
-                        <DataGridTextColumn Header="強度 (MPa)" Binding="{Binding Strength}" />
+                        <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="材料名稱" Binding="{Binding MaterialName, Mode=TwoWay}" />
+                        <DataGridTextColumn Header="密度 (kg/m³)" Binding="{Binding Density, Mode=TwoWay}" />
+                        <DataGridTextColumn Header="彈性模數 (Pa)" Binding="{Binding ElasticModulus, Mode=TwoWay, StringFormat=E3}" />
+                        <DataGridTextColumn Header="強度 (MPa)" Binding="{Binding Strength, Mode=TwoWay}" />
                     </DataGrid.Columns>
                 </DataGrid>
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
