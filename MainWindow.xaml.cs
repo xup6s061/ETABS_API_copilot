@@ -13,5 +13,10 @@ namespace ETABS_API_copilot
             InitializeComponent();
             DataContext = new MainViewModel(); // 設置 DataContext
         }
+
+        private void DataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

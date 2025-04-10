@@ -17,7 +17,7 @@
         </TabItem>
         <!-- Added missing closing tag for TabItem -->
 
-        <TabItem Header="參數" Height="21" Margin="-2,-2,-2,0" VerticalAlignment="Top">
+        <TabItem Header="參數">
             <StackPanel Margin="10">
                 <DataGrid ItemsSource="{Binding Buildings}" AutoGenerateColumns="False" Height="200">
                     <DataGrid.Columns>
@@ -33,6 +33,31 @@
                     <Button Content="執行所有建物" Command="{Binding ExecuteSelectedBuildingsCommand}" Margin="5" />
                 </StackPanel>
             </StackPanel>
+        </TabItem>
+        <!-- 材料 Tab -->
+        <TabItem Header="材料">
+            <DataGrid ItemsSource="{Binding SelectedBuilding.Materials}" AutoGenerateColumns="False" SelectionChanged="DataGrid_SelectionChanged">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
+                    <DataGridTextColumn Header="材料名稱" Binding="{Binding MaterialName}" />
+                    <DataGridTextColumn Header="密度" Binding="{Binding Density}" />
+                    <DataGridTextColumn Header="彈性模數" Binding="{Binding ElasticModulus}" />
+                    <DataGridTextColumn Header="強度" Binding="{Binding Strength}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </TabItem>
+
+        <!-- 斷面 Tab -->
+        <TabItem Header="斷面">
+            <DataGrid ItemsSource="{Binding SelectedBuilding.SectionProperties}" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
+                    <DataGridTextColumn Header="斷面名稱" Binding="{Binding SectionName}" />
+                    <DataGridTextColumn Header="材料" Binding="{Binding Material}" />
+                    <DataGridTextColumn Header="寬度" Binding="{Binding Width}" />
+                    <DataGridTextColumn Header="高度" Binding="{Binding Height}" />
+                </DataGrid.Columns>
+            </DataGrid>
         </TabItem>
     </TabControl>
 </Window>
