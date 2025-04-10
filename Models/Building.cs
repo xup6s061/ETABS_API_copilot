@@ -10,6 +10,7 @@ namespace ETABS_API_copilot.Models
     {
         public string BuildingName { get; set; }
         public string MaterialName { get; set; }
+        public string MaterialType { get; set; }
         public double Density { get; set; }
         public double ElasticModulus { get; set; }
         public double Strength { get; set; }

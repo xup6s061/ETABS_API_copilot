@@ -358,12 +358,44 @@ namespace ETABS_API_copilot.ViewModels
             try
             {
                 var sapModel = _etabsObject.SapModel;
-                int ret = sapModel.PropMaterial.SetMaterial(material.MaterialName, eMatType.Steel);
+
+                // 根據材料類型設定 eMatType
+                eMatType materialType;
+                switch (material.MaterialType)
+                {
+                    case "Steel":
+                        materialType = eMatType.Steel;
+                        break;
+                    case "Concrete":
+                        materialType = eMatType.Concrete;
+                        break;
+                    case "Aluminum":
+                        materialType = eMatType.Aluminum;
+                        break;
+                    case "ColdFormed":
+                        materialType = eMatType.ColdFormed;
+                        break;
+                    case "Rebar":
+                        materialType = eMatType.Rebar;
+                        break;
+                    case "Tendon":
+                        materialType = eMatType.Tendon;
+                        break;
+                    case "Masonry":
+                        materialType = eMatType.Masonry;
+                        break;
+                    case "Other":
+                        materialType = eMatType.NoDesign; // 假設 "Other" 對應 NoDesign
+                        break;
+                    default:
+                        throw new ArgumentException($"未知的材料類型: {material.MaterialType}");
+                }
+
+                int ret = sapModel.PropMaterial.SetMaterial(material.MaterialName, materialType);
                 if (ret == 0)
                 {
                     sapModel.PropMaterial.SetMPIsotropic(material.MaterialName, material.ElasticModulus, material.PoissonRatio, material.CoefficientThermalExpansion);
                     sapModel.PropMaterial.SetWeightAndMass(material.MaterialName, 0, material.Density);
-
                 }
             }
             catch (Exception ex)
