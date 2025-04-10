@@ -10,6 +10,7 @@ using System.Text.Json;
 using Microsoft.Win32;
 using ETABS_API_copilot.Models;
 using ETABS_API_copilot.Services;
+using System.Windows.Forms;
 
 namespace ETABS_API_copilot.ViewModels
 {
@@ -25,15 +26,17 @@ namespace ETABS_API_copilot.ViewModels
         public ObservableCollection<Building> Buildings { get; set; } = new ObservableCollection<Building>();
         public RelayCommand LoadJsonCommand { get; }
         public RelayCommand SaveJsonCommand { get; }
+        public RelayCommand ExecuteSelectedBuildingsCommand { get; }
+
 
         // 屬性
         private string _floorHeightsInput = "2@3,5"; // Default floor heights
         private string _xSpanLengthsInput = "2@3,5"; // Default X spans
         private string _ySpanLengthsInput = "2@4,5"; // Default Y spans
 
-        private double[] _xSpanLengths; // Parsed X spans
-        private double[] _ySpanLengths; // Parsed Y spans
-        private double[] _floorHeights; // Parsed floor heights
+        private readonly double[] _xSpanLengths; // Parsed X spans
+        private readonly double[] _ySpanLengths; // Parsed Y spans
+        private readonly double[] _floorHeights; // Parsed floor heights
 
         public string FloorHeightsInput
         {
@@ -70,9 +73,11 @@ namespace ETABS_API_copilot.ViewModels
         {
             OpenETABSCommand = new RelayCommand(OpenETABS);
             CreateNewETABSFileCommand = new RelayCommand(CreateNewETABSFile, CanCreateNewETABSFile);
-            CreateBuildingFrameworkCommand = new RelayCommand(CreateBuildingFramework, CanCreateBuildingFramework);
+            CreateBuildingFrameworkCommand = new RelayCommand(() => CreateBuildingFramework(_xSpanLengths, _ySpanLengths, _floorHeights), CanCreateBuildingFramework);
             LoadJsonCommand = new RelayCommand(LoadJson);
             SaveJsonCommand = new RelayCommand(SaveJson);
+            ExecuteSelectedBuildingsCommand = new RelayCommand(ExecuteSelectedBuildings);
+
         }
 
         // 打開 ETABS
@@ -83,12 +88,12 @@ namespace ETABS_API_copilot.ViewModels
                 cHelper myHelper = new Helper();
                 _etabsObject = myHelper.CreateObjectProgID("CSI.ETABS.API.ETABSObject");
                 _etabsObject.ApplicationStart();
-                MessageBox.Show("ETABS 已成功打開！");
+                //System.Windows.MessageBox.Show("ETABS 已成功打開！");
                 CommandManager.InvalidateRequerySuggested(); // 通知命令狀態改變
             }
             catch (Exception ex)
             {
-                MessageBox.Show("打開 ETABS 時發生錯誤: " + ex.Message);
+                System.Windows.MessageBox.Show("打開 ETABS 時發生錯誤: " + ex.Message);
             }
         }
 
@@ -99,41 +104,41 @@ namespace ETABS_API_copilot.ViewModels
             {
                 if (!IsETABSRunning())
                 {
-                    MessageBox.Show("請先打開 ETABS！");
+                    System.Windows.MessageBox.Show("請先打開 ETABS！");
                     return;
                 }
 
                 cSapModel sapModel = _etabsObject?.SapModel;
                 if (sapModel == null)
                 {
-                    MessageBox.Show("無法獲取 ETABS 的 SapModel 對象！");
+                    System.Windows.MessageBox.Show("無法獲取 ETABS 的 SapModel 對象！");
                     return;
                 }
 
                 int ret = sapModel.InitializeNewModel(eUnits.kN_m_C);
                 if (ret != 0)
                 {
-                    MessageBox.Show($"初始化新模型失敗，錯誤代碼: {ret}");
+                    System.Windows.MessageBox.Show($"初始化新模型失敗，錯誤代碼: {ret}");
                     return;
                 }
 
                 ret = sapModel.File.NewBlank();
                 if (ret != 0)
                 {
-                    MessageBox.Show($"創建新檔案失敗，錯誤代碼: {ret}");
+                    System.Windows.MessageBox.Show($"創建新檔案失敗，錯誤代碼: {ret}");
                     return;
                 }
 
-                MessageBox.Show("ETABS 新檔案已成功建立！");
+                //System.Windows.MessageBox.Show("ETABS 新檔案已成功建立！");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("建立 ETABS 新檔案時發生錯誤: " + ex.Message);
+                System.Windows.MessageBox.Show("建立 ETABS 新檔案時發生錯誤: " + ex.Message);
             }
         }
         private void LoadJson()
         {
-            var openFileDialog = new OpenFileDialog
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
             {
                 Filter = "JSON Files (*.json)|*.json",
                 Title = "選擇 JSON 檔案"
@@ -152,7 +157,7 @@ namespace ETABS_API_copilot.ViewModels
 
         private void SaveJson()
         {
-            var saveFileDialog = new SaveFileDialog
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "JSON Files (*.json)|*.json",
                 Title = "儲存 JSON 檔案"
@@ -165,34 +170,21 @@ namespace ETABS_API_copilot.ViewModels
         }
 
         // 創建建築物構架
-        private void CreateBuildingFramework()
+        private void CreateBuildingFramework(double[] xSpanLengths, double[] ySpanLengths, double[] floorHeights)
         {
             try
             {
                 if (!IsETABSRunning())
                 {
-                    MessageBox.Show("請先打開 ETABS！");
+                    System.Windows.MessageBox.Show("請先打開 ETABS！");
                     return;
                 }
 
-                // 嘗試解析 X 和 Y 方向的跨距輸入以及樓層高度
-                try
+                if (xSpanLengths == null || xSpanLengths.Length == 0 ||
+                    ySpanLengths == null || ySpanLengths.Length == 0 ||
+                    floorHeights == null || floorHeights.Length == 0)
                 {
-                    _xSpanLengths = ParseSpanLengths(_xSpanLengthsInput);
-                    _ySpanLengths = ParseSpanLengths(_ySpanLengthsInput);
-                    _floorHeights = ParseSpanLengths(_floorHeightsInput);
-                }
-                catch
-                {
-                    MessageBox.Show("無法解析輸入，請確保格式正確，例如: 2@5,3");
-                    return;
-                }
-
-                if (_xSpanLengths == null || _xSpanLengths.Length == 0 ||
-                    _ySpanLengths == null || _ySpanLengths.Length == 0 ||
-                    _floorHeights == null || _floorHeights.Length == 0)
-                {
-                    MessageBox.Show("請輸入有效的跨距或樓層高度！");
+                    System.Windows.MessageBox.Show("請輸入有效的跨距或樓層高度！");
                     return;
                 }
 
@@ -200,28 +192,28 @@ namespace ETABS_API_copilot.ViewModels
 
                 double zPrev = 0; // 初始化 zPrev 為 0
 
-                for (int floor = 0; floor < _floorHeights.Length; floor++)
+                for (int floor = 0; floor < floorHeights.Length; floor++)
                 {
-                    double z = zPrev + _floorHeights[floor]; // 當前樓層的高度為前一樓層高度加上當前樓層高度
+                    double z = zPrev + floorHeights[floor]; // 當前樓層的高度為前一樓層高度加上當前樓層高度
                     double x1 = 0; // 起始位置 x = 0
 
-                    for (int xSpan = 0; xSpan <= _xSpanLengths.Length; xSpan++) // 包含最後一列
+                    for (int xSpan = 0; xSpan <= xSpanLengths.Length; xSpan++) // 包含最後一列
                     {
-                        double x2 = xSpan < _xSpanLengths.Length ? x1 + _xSpanLengths[xSpan] : x1;
+                        double x2 = xSpan < xSpanLengths.Length ? x1 + xSpanLengths[xSpan] : x1;
                         double y1 = 0; // 起始位置 y = 0
 
-                        for (int ySpan = 0; ySpan <= _ySpanLengths.Length; ySpan++) // 包含最後一列
+                        for (int ySpan = 0; ySpan <= ySpanLengths.Length; ySpan++) // 包含最後一列
                         {
-                            double y2 = ySpan < _ySpanLengths.Length ? y1 + _ySpanLengths[ySpan] : y1;
+                            double y2 = ySpan < ySpanLengths.Length ? y1 + ySpanLengths[ySpan] : y1;
 
                             // 添加梁（僅在樓層大於等於 0 且不是最後一列時）
-                            if (floor >= 0 && xSpan < _xSpanLengths.Length)
+                            if (floor >= 0 && xSpan < xSpanLengths.Length)
                             {
                                 string beamNameX = "BeamX";
                                 sapModel.FrameObj.AddByCoord(x1, y1, z, x2, y1, z, ref beamNameX, "", "Auto");
                             }
 
-                            if (floor >= 0 && ySpan < _ySpanLengths.Length)
+                            if (floor >= 0 && ySpan < ySpanLengths.Length)
                             {
                                 string beamNameY = "BeamY";
                                 sapModel.FrameObj.AddByCoord(x1, y1, z, x1, y2, z, ref beamNameY, "", "Auto");
@@ -240,11 +232,11 @@ namespace ETABS_API_copilot.ViewModels
                     zPrev = z; // 更新 zPrev 為當前樓層的高度
                 }
 
-                MessageBox.Show("三維建築物構架已成功創建！");
+                //System.Windows.MessageBox.Show("三維建築物構架已成功創建！");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("創建建築物構架時發生錯誤: " + ex.Message);
+                System.Windows.MessageBox.Show("創建建築物構架時發生錯誤: " + ex.Message);
             }
         }
 
@@ -284,6 +276,56 @@ namespace ETABS_API_copilot.ViewModels
             }
 
             return spanList.ToArray();
+        }
+        private void ExecuteSelectedBuildings()
+        {
+            if (Buildings == null || Buildings.Count == 0)
+            {
+                System.Windows.MessageBox.Show("沒有可執行的建物參數！");
+                return;
+            }
+
+            var folderDialog = new System.Windows.Forms.FolderBrowserDialog
+            {
+                Description = "選擇存檔路徑"
+            };
+
+            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string folderPath = folderDialog.SelectedPath;
+
+                foreach (var building in Buildings)
+                {
+                    try
+                    {
+                        // 創建新檔案
+                        CreateNewETABSFile();
+
+                        // 解析參數
+                        double[] xSpanLengths = ParseSpanLengths(building.XSpans);
+                        double[] ySpanLengths = ParseSpanLengths(building.YSpans);
+                        double[] floorHeights = ParseSpanLengths(building.FloorHeights);
+
+                        // 呼叫 CreateBuildingFramework，傳入解析後的參數
+                        CreateBuildingFramework(xSpanLengths, ySpanLengths, floorHeights);
+
+                        // 儲存檔案
+                        string filePath = Path.Combine(folderPath, $"{building.BuildingName}.edb");
+                        int ret = _etabsObject.SapModel.File.Save(filePath);
+
+                        if (ret != 0)
+                        {
+                            System.Windows.MessageBox.Show($"儲存檔案失敗: {building.BuildingName}，錯誤代碼: {ret}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.MessageBox.Show($"執行建物 {building.BuildingName} 時發生錯誤: {ex.Message}");
+                    }
+                }
+
+                System.Windows.MessageBox.Show("所有建物已成功執行並儲存！");
+            }
         }
 
         // 檢查 ETABS 是否正在運行
