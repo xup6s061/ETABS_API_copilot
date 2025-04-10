@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace YourNamespace.ViewModels
+namespace ETABS_API_copilot.ViewModels
 {
     public class RelayCommand : ICommand
     {

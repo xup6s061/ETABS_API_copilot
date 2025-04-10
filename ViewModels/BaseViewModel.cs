@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
-namespace YourNamespace.ViewModels
+namespace ETABS_API_copilot.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {

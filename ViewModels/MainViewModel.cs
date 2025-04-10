@@ -4,17 +4,27 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using ETABSv1;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Text.Json;
+using Microsoft.Win32;
+using ETABS_API_copilot.Models;
+using ETABS_API_copilot.Services;
 
-namespace YourNamespace.ViewModels
+namespace ETABS_API_copilot.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
         private cOAPI _etabsObject;
+        private readonly JsonService _jsonService = new JsonService();
 
         // 命令
         public ICommand OpenETABSCommand { get; }
         public ICommand CreateNewETABSFileCommand { get; }
         public ICommand CreateBuildingFrameworkCommand { get; }
+        public ObservableCollection<Building> Buildings { get; set; } = new ObservableCollection<Building>();
+        public RelayCommand LoadJsonCommand { get; }
+        public RelayCommand SaveJsonCommand { get; }
 
         // 屬性
         private string _floorHeightsInput = "2@3,5"; // Default floor heights
@@ -61,6 +71,8 @@ namespace YourNamespace.ViewModels
             OpenETABSCommand = new RelayCommand(OpenETABS);
             CreateNewETABSFileCommand = new RelayCommand(CreateNewETABSFile, CanCreateNewETABSFile);
             CreateBuildingFrameworkCommand = new RelayCommand(CreateBuildingFramework, CanCreateBuildingFramework);
+            LoadJsonCommand = new RelayCommand(LoadJson);
+            SaveJsonCommand = new RelayCommand(SaveJson);
         }
 
         // 打開 ETABS
@@ -117,6 +129,38 @@ namespace YourNamespace.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show("建立 ETABS 新檔案時發生錯誤: " + ex.Message);
+            }
+        }
+        private void LoadJson()
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "JSON Files (*.json)|*.json",
+                Title = "選擇 JSON 檔案"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var buildings = _jsonService.LoadFromJson(openFileDialog.FileName);
+                Buildings.Clear();
+                foreach (var building in buildings)
+                {
+                    Buildings.Add(building);
+                }
+            }
+        }
+
+        private void SaveJson()
+        {
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "JSON Files (*.json)|*.json",
+                Title = "儲存 JSON 檔案"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                _jsonService.SaveToJson(saveFileDialog.FileName, new List<Building>(Buildings));
             }
         }
 

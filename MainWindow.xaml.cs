@@ -2,9 +2,9 @@
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Windows;
-using YourNamespace.ViewModels; // 引用包含 MainViewModel 的命名空間
+using ETABS_API_copilot.ViewModels; // 引用包含 MainViewModel 的命名空間
 
-namespace YourNamespace
+namespace ETABS_API_copilot
 {
     public partial class MainWindow : Window
     {
