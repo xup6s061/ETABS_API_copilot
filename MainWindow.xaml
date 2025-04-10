@@ -1,7 +1,7 @@
 ﻿<Window x:Class="ETABS_API_copilot.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="建築物構架生成器" Height="400" Width="500">
+        Title="建築物構架生成器" Height="450" Width="500">
     <TabControl>
         <!-- 基本 Tab -->
         <TabItem Header="基本">
@@ -20,7 +20,7 @@
         <!-- 參數 Tab -->
         <TabItem Header="參數">
             <StackPanel Margin="10">
-                <DataGrid ItemsSource="{Binding Buildings}" AutoGenerateColumns="False" Height="200">
+                <DataGrid ItemsSource="{Binding Buildings}" AutoGenerateColumns="False" Height="300">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
                         <DataGridTextColumn Header="樓層高度 (m)" Binding="{Binding FloorHeights}" />
@@ -35,32 +35,48 @@
                 </StackPanel>
             </StackPanel>
         </TabItem>
-
-        <!-- 材料 Tab -->
-        <TabItem Header="材料">
-            <DataGrid ItemsSource="{Binding AllMaterials}" AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
-                    <DataGridTextColumn Header="材料名稱" Binding="{Binding MaterialName}" />
-                    <DataGridTextColumn Header="密度 (kg/m³)" Binding="{Binding Density}" />
-                    <DataGridTextColumn Header="彈性模數 (Pa)" Binding="{Binding ElasticModulus}" />
-                    <DataGridTextColumn Header="強度 (MPa)" Binding="{Binding Strength}" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </TabItem>
-
+        
         <!-- 斷面 Tab -->
         <TabItem Header="斷面">
-            <DataGrid ItemsSource="{Binding AllSectionProperties}" AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
-                    <DataGridTextColumn Header="斷面名稱" Binding="{Binding SectionName}" />
-                    <DataGridTextColumn Header="材料" Binding="{Binding Material}" />
-                    <DataGridTextColumn Header="寬度 (m)" Binding="{Binding Width}" />
-                    <DataGridTextColumn Header="高度 (m)" Binding="{Binding Height}" />
-                </DataGrid.Columns>
-            </DataGrid>
+            <StackPanel Margin="10">
+                <DataGrid ItemsSource="{Binding AllSectionProperties}" AutoGenerateColumns="False" Height="300">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
+                        <DataGridTextColumn Header="斷面名稱" Binding="{Binding SectionName}" />
+                        <DataGridTextColumn Header="材料" Binding="{Binding Material}" />
+                        <DataGridTextColumn Header="寬度 (m)" Binding="{Binding Width}" />
+                        <DataGridTextColumn Header="高度 (m)" Binding="{Binding Height}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Content="讀取 JSON" Command="{Binding LoadJsonCommand}" Margin="5" />
+                    <Button Content="匯出 JSON" Command="{Binding SaveJsonCommand}" Margin="5" />
+                    <Button Content="執行所有建物" Command="{Binding ExecuteSelectedBuildingsCommand}" Margin="5" />
+                </StackPanel>
+            </StackPanel>
         </TabItem>
+        
+        <!-- 材料 Tab -->
+        <TabItem Header="材料">
+            <StackPanel Margin="10">
+                <DataGrid ItemsSource="{Binding AllMaterials}" AutoGenerateColumns="False" Height="300">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
+                        <DataGridTextColumn Header="材料名稱" Binding="{Binding MaterialName}" />
+                        <DataGridTextColumn Header="密度 (kg/m³)" Binding="{Binding Density}" />
+                        <DataGridTextColumn Header="彈性模數 (Pa)" Binding="{Binding ElasticModulus, StringFormat=E3}" />
+                        <DataGridTextColumn Header="強度 (MPa)" Binding="{Binding Strength}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Content="讀取 JSON" Command="{Binding LoadJsonCommand}" Margin="5" />
+                    <Button Content="匯出 JSON" Command="{Binding SaveJsonCommand}" Margin="5" />
+                    <Button Content="執行所有建物" Command="{Binding ExecuteSelectedBuildingsCommand}" Margin="5" />
+                </StackPanel>
+            </StackPanel>
+            
+        </TabItem>
+        
     </TabControl>
 
 </Window>

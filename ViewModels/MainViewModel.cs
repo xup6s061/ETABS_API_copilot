@@ -165,6 +165,19 @@ namespace ETABS_API_copilot.ViewModels
 
             if (saveFileDialog.ShowDialog() == true)
             {
+                // 將 AllMaterials 和 AllSectionProperties 的修改同步回 Buildings
+                foreach (var building in Buildings)
+                {
+                    building.Materials = AllMaterials
+                        .Where(m => m.BuildingName == building.BuildingName)
+                        .ToList();
+
+                    building.SectionProperties = AllSectionProperties
+                        .Where(s => s.BuildingName == building.BuildingName)
+                        .ToList();
+                }
+
+                // 儲存到 JSON 檔案
                 _jsonService.SaveToJson(saveFileDialog.FileName, new List<Building>(Buildings));
             }
         }
