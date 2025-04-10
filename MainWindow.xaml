@@ -5,25 +5,12 @@
     <TabControl>
         <TabItem Header="基本">
             <StackPanel Margin="20">
-                <TextBlock Text="樓層高度 (以逗號分隔):" />
-                <TextBox Text="{Binding FloorHeightsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
-
-                <TextBlock Text="X方向跨距 (以逗號分隔):" />
-                <TextBox Text="{Binding XSpanLengthsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
-
-                <TextBlock Text="Y方向跨距 (以逗號分隔):" />
-                <TextBox Text="{Binding YSpanLengthsInput, UpdateSourceTrigger=PropertyChanged}" Width="200" />
-
                 <Button Content="開啟 ETABS"
                     Command="{Binding OpenETABSCommand}"
                     Margin="10"
                     Width="200" />
                 <Button Content="創建新檔案"
                     Command="{Binding CreateNewETABSFileCommand}"
-                    Margin="10"
-                    Width="200" />
-                <Button Content="創建建築物構架"
-                    Command="{Binding CreateBuildingFrameworkCommand}"
                     Margin="10"
                     Width="200" />
             </StackPanel>
@@ -43,7 +30,7 @@
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                     <Button Content="讀取 JSON" Command="{Binding LoadJsonCommand}" Margin="5" />
                     <Button Content="匯出 JSON" Command="{Binding SaveJsonCommand}" Margin="5" />
-                    <Button Content="執行選取建物" Command="{Binding ExecuteSelectedBuildingsCommand}" Margin="5" />
+                    <Button Content="執行所有建物" Command="{Binding ExecuteSelectedBuildingsCommand}" Margin="5" />
                 </StackPanel>
             </StackPanel>
         </TabItem>

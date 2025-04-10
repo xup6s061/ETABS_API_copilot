@@ -30,43 +30,10 @@ namespace ETABS_API_copilot.ViewModels
 
 
         // 屬性
-        private string _floorHeightsInput = "2@3,5"; // Default floor heights
-        private string _xSpanLengthsInput = "2@3,5"; // Default X spans
-        private string _ySpanLengthsInput = "2@4,5"; // Default Y spans
-
         private readonly double[] _xSpanLengths; // Parsed X spans
         private readonly double[] _ySpanLengths; // Parsed Y spans
         private readonly double[] _floorHeights; // Parsed floor heights
 
-        public string FloorHeightsInput
-        {
-            get => _floorHeightsInput;
-            set
-            {
-                _floorHeightsInput = value;
-                OnPropertyChanged(nameof(FloorHeightsInput));
-            }
-        }
-
-        public string XSpanLengthsInput
-        {
-            get => _xSpanLengthsInput;
-            set
-            {
-                _xSpanLengthsInput = value;
-                OnPropertyChanged(nameof(XSpanLengthsInput));
-            }
-        }
-
-        public string YSpanLengthsInput
-        {
-            get => _ySpanLengthsInput;
-            set
-            {
-                _ySpanLengthsInput = value;
-                OnPropertyChanged(nameof(YSpanLengthsInput));
-            }
-        }
 
         // 構造函數
         public MainViewModel()
