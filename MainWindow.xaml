@@ -50,8 +50,8 @@
                         <DataGridTextColumn Header="建築物名稱" Binding="{Binding BuildingName}" />
                         <DataGridTextColumn Header="斷面名稱" Binding="{Binding SectionName}" />
                         <DataGridTextColumn Header="材料" Binding="{Binding Material}" />
-                        <DataGridTextColumn Header="寬度 (m)" Binding="{Binding Width}" />
                         <DataGridTextColumn Header="高度 (m)" Binding="{Binding Height}" />
+                        <DataGridTextColumn Header="寬度 (m)" Binding="{Binding Width}" />
                     </DataGrid.Columns>
                 </DataGrid>
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">

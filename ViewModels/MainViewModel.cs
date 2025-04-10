@@ -322,6 +322,18 @@ namespace ETABS_API_copilot.ViewModels
                         // 呼叫 CreateBuildingFramework，傳入解析後的參數
                         CreateBuildingFramework(xSpanLengths, ySpanLengths, floorHeights);
 
+                        // 建立材料
+                        foreach (var material in AllMaterials.Where(m => m.BuildingName == building.BuildingName))
+                        {
+                            CreateMaterial(material);
+                        }
+
+                        // 建立斷面屬性
+                        foreach (var section in AllSectionProperties.Where(s => s.BuildingName == building.BuildingName))
+                        {
+                            CreateSectionProperty(section);
+                        }
+
                         // 儲存檔案
                         string filePath = Path.Combine(folderPath, $"{building.BuildingName}.edb");
                         int ret = _etabsObject.SapModel.File.Save(filePath);
@@ -338,6 +350,42 @@ namespace ETABS_API_copilot.ViewModels
                 }
 
                 System.Windows.MessageBox.Show("所有建物已成功執行並儲存！");
+            }
+        }
+        // 建立材料
+        private void CreateMaterial(Material material)
+        {
+            try
+            {
+                var sapModel = _etabsObject.SapModel;
+                int ret = sapModel.PropMaterial.SetMaterial(material.MaterialName, eMatType.Steel);
+                if (ret == 0)
+                {
+                    sapModel.PropMaterial.SetMPIsotropic(material.MaterialName, material.ElasticModulus, material.PoissonRatio, material.CoefficientThermalExpansion);
+                    sapModel.PropMaterial.SetWeightAndMass(material.MaterialName, 0, material.Density);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"建立材料 {material.MaterialName} 時發生錯誤: {ex.Message}");
+            }
+        }
+        // 建立斷面屬性
+        private void CreateSectionProperty(SectionProperty section)
+        {
+            try
+            {
+                var sapModel = _etabsObject.SapModel;
+                int ret = sapModel.PropFrame.SetRectangle(section.SectionName, section.Material, section.Height, section.Width);
+                if (ret != 0)
+                {
+                    System.Windows.MessageBox.Show($"建立斷面屬性 {section.SectionName} 失敗，錯誤代碼: {ret}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"建立斷面屬性 {section.SectionName} 時發生錯誤: {ex.Message}");
             }
         }
 

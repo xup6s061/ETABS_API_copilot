@@ -8,11 +8,13 @@ namespace ETABS_API_copilot.Models
 {
     public class Material
     {
-        public string BuildingName { get; set; } // 所屬建築物名稱
-        public string MaterialName { get; set; } // 材料名稱
-        public double Density { get; set; } // 材料密度
-        public double ElasticModulus { get; set; } // 彈性模數
-        public double Strength { get; set; } // 材料強度
+        public string BuildingName { get; set; }
+        public string MaterialName { get; set; }
+        public double Density { get; set; }
+        public double ElasticModulus { get; set; }
+        public double Strength { get; set; }
+        public double PoissonRatio { get; set; } // Added property
+        public double CoefficientThermalExpansion { get; set; } // Added property
     }
 
     public class SectionProperty
