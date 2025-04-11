@@ -11,6 +11,7 @@ using Microsoft.Win32;
 using ETABS_API_copilot.Models;
 using ETABS_API_copilot.Services;
 using System.Windows.Forms;
+using static System.Net.WebRequestMethods;
 
 namespace ETABS_API_copilot.ViewModels
 {
@@ -391,11 +392,18 @@ namespace ETABS_API_copilot.ViewModels
                         throw new ArgumentException($"未知的材料類型: {material.MaterialType}");
                 }
 
+                // 設定材料屬性
                 int ret = sapModel.PropMaterial.SetMaterial(material.MaterialName, materialType);
                 if (ret == 0)
                 {
                     sapModel.PropMaterial.SetMPIsotropic(material.MaterialName, material.ElasticModulus, material.PoissonRatio, material.CoefficientThermalExpansion);
                     sapModel.PropMaterial.SetWeightAndMass(material.MaterialName, 0, material.Density);
+
+                    // 僅當材料類型為 Concrete 時，設定 SetOConcrete
+                    if (materialType == eMatType.Concrete)
+                    {
+                        sapModel.PropMaterial.SetOConcrete(material.MaterialName, material.Strength * 98, false, 0, 1, 2, 0.002, 0.003);
+                    }
                 }
             }
             catch (Exception ex)

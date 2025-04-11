@@ -74,7 +74,7 @@
                         <DataGridTextColumn Header="材料名稱" Binding="{Binding MaterialName, Mode=TwoWay}" />
                         <DataGridTextColumn Header="密度 (kg/m³)" Binding="{Binding Density, Mode=TwoWay}" />
                         <DataGridTextColumn Header="彈性模數 (Pa)" Binding="{Binding ElasticModulus, Mode=TwoWay, StringFormat=E3}" />
-                        <DataGridTextColumn Header="強度 (MPa)" Binding="{Binding Strength, Mode=TwoWay}" />
+                        <DataGridTextColumn Header="強度 (kgf/cm²)" Binding="{Binding Strength, Mode=TwoWay}" />
                     </DataGrid.Columns>
                 </DataGrid>
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
