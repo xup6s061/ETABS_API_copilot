@@ -35,5 +35,11 @@ namespace ETABS_API_copilot.Models
         public string YSpans { get; set; }      // Y方向跨距 (以逗號分隔)
         public List<Material> Materials { get; set; } // 材料清單
         public List<SectionProperty> SectionProperties { get; set; } // 斷面性質清單
+
+        public bool TryGetMaterial(string materialName, out Material material)
+        {
+            material = Materials?.FirstOrDefault(m => m.MaterialName == materialName);
+            return material != null;
+        }
     }
 }
