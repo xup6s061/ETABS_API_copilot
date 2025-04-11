@@ -404,6 +404,10 @@ namespace ETABS_API_copilot.ViewModels
                     {
                         sapModel.PropMaterial.SetOConcrete(material.MaterialName, material.Strength * 98, false, 0, 1, 2, 0.002, 0.003);
                     }
+                    if (materialType == eMatType.Rebar)
+                    {
+                        sapModel.PropMaterial.SetORebar(material.MaterialName, material.Strength * 98, material.Strength * 98 * 1.5, material.Strength * 98 * 1.15, material.Strength * 98 * 1.5 * 1.15, 2, 2, material.Strength/material.ElasticModulus, material.Strength / material.ElasticModulus + 0.003, false);
+                    }
                 }
             }
             catch (Exception ex)
